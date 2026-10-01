@@ -19,8 +19,9 @@
 # diagonalmente
 # Detectar un empate (Hay empate cuando el tablero está lleno y ningún jugador consiguió 3 en línea.)
 # Informar el resultado final.
-# Permitir comenzar una nueva partida.
 
+
+# Función para imprimir el tablero
 def imprimir_tablero(tablero: list):
     for i in range(len(tablero)):
         for j in range(len(tablero[i])):
@@ -28,19 +29,49 @@ def imprimir_tablero(tablero: list):
         print()
 
 
+# Asigna el valor del turno actual
 def asignar_valor(tablero: list, posicion: list, valor: str):
+
+    # Hasta que la posición no este ocupada pide una nueva
+    while verificar_posicion(tablero, posicion):
+        imprimir_tablero(tablero)
+        print("Posición ocupada")
+        posicion = pedir_posicion()
+
+    # Asigna el valor al tablero en la posición validada
     for i in range(len(tablero)):
         for j in range(len(tablero[i])):
             if i == posicion[0] and j == posicion[1]:
                 tablero[i][j] = f"[{valor.upper()}]"
 
+    # Retornamos el tablero despues de la modificación 
+    # Tambien la posición para despues validar si el turno ganó
+    return tablero, posicion
 
+
+# Pedir la posición del valor a ingresar
+def pedir_posicion():
+    posicion = []
+    posicion.append(int(input("Ingrese posición i: ")))
+    posicion.append(int(input("Ingrese posición j: ")))
+
+    while posicion[0] < 0 or posicion[0] > 2 or posicion[1] < 0 or posicion[1] > 2:
+        print("Posición inválida")
+
+        posicion[0] = int(input("Ingrese posición i: "))
+        posicion[1] = int(input("Ingrese posición j: "))
+
+    return posicion
+
+
+# Verificar si la posición esta ocupada
 def verificar_posicion(tablero: list, posicion: list):
     if tablero[posicion[0]][posicion[1]] != "[ ]":
         return True
     return False
 
 
+# Verificamos si la posición ingresada hace que este gane 
 def verificar_ganador(tablero: list, posicion: list):
     fila_gana = True
     columna_gana = True
@@ -89,33 +120,40 @@ def verificar_ganador(tablero: list, posicion: list):
    
     return False
 
+# Si el tablero esta lleno se considera un empate entonces devolvemos True
+def verificar_empate(tablero: list):
+    for fila in tablero:
+        for elemento in fila:
+            if elemento == "[ ]":
+                return False
+    return True  
 
 
-
-
-
+# Juego
 tablero = [
-    ["[ ]", "[X]", "[X]"],
-    ["[ ]", "[ ]", "[ ]"],
-    ["[ ]", "[ ]", "[ ]"]
+    ["[X]", "[O]", "[X]"],
+    ["[X]", "[O]", "[O]"],
+    ["[O]", "[ ]", "[ ]"]
 ]
 
+turno = "X"
 
+while True:
+    imprimir_tablero(tablero)
+    posicion = pedir_posicion()
+    tablero, posicion = asignar_valor(tablero,posicion, turno)
 
-# asignar_valor(tablero, [1,2], "X")
-# imprimir_tablero(tablero)
+    if verificar_ganador(tablero, posicion):
+        imprimir_tablero(tablero)
+        print(f"Ganó {turno}")
+        break
 
+    if verificar_empate(tablero):
+        imprimir_tablero(tablero)
+        print("Hay un empate")
+        break
 
-# print(verificar_posicion(tablero, [1,2]))
-# imprimir_tablero(tablero)
-
-# asignar_valor(tablero, [2,2], "x")
-# posicion = [0,0]
-# posicion = [1,1]
-
-
-posicion = [2,0]
-asignar_valor(tablero,posicion, "X")
-print(verificar_ganador(tablero, posicion))
-
-imprimir_tablero(tablero)
+    if turno == "X":
+        turno = "O"
+    else:
+        turno = "X"
